@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CSSD Logbooks — Tebow CURE Children's Hospital</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ======================= PRE-LAUNCH GATE ======================= -->
+  <div id="view-launch-gate" class="hidden"></div>
+
+  <!-- ======================= LOGIN / KIOSK ======================= -->
+  <div id="view-login">
+    <div class="login-card" id="login-card"><!-- filled dynamically by auth.js --></div>
+  </div>
+
+  <!-- ======================= PUBLIC COMPLIANCE DASHBOARD (no login) ======================= -->
+  <div id="view-public-dashboard" class="hidden"></div>
+
+  <!-- ======================= HANDOVER SUBMISSION PORTAL (no login — other departments) ======================= -->
+  <div id="view-handover-submit" class="hidden"></div>
+
+  <!-- ======================= MAIN APP SHELL ======================= -->
+  <div id="view-main" class="hidden">
+    <!-- Mobile-only persistent header. Home+quickstrip show for user/admin
+         (bento pattern); avatar shows for superuser (offcanvas pattern).
+         Role-scoped visibility is handled in CSS via body.role-* classes. -->
+    <div class="mobile-topbar" id="mobile-topbar">
+      <button class="mobile-home-btn" id="mobile-home-btn" title="Home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+      </button>
+      <div class="mobile-topbar-info">
+        <span class="mono" id="mobile-datetime">—</span>
+        <span id="mobile-username">—</span>
+      </div>
+      <button class="mobile-avatar-btn" id="mobile-avatar-btn">—</button>
+    </div>
+    <div class="mobile-quickstrip" id="mobile-quickstrip"></div>
+    <div id="mobile-offcanvas-backdrop" class="hidden"></div>
+
+    <nav class="sidebar">
+      <div class="brand">
+        <div class="mark"></div>
+        <div class="name">CSSD Logbooks<span>Tebow CURE Children's</span></div>
+      </div>
+
+      <div class="nav-group">
+        <button class="nav-item" data-view="categories">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+          Home
+        </button>
+      </div>
+
+      <div class="nav-group role-admin-plus hidden">
+        <button class="nav-item" data-view="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Dashboard
+        </button>
+      </div>
+
+      <div class="nav-label">Logbooks</div>
+
+      <div class="nav-category cat-autoclave">
+        <div class="nav-category-label">Autoclave Maintenance</div>
+        <button class="nav-item" data-view="equipment">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          Equipment Downtime
+          <span class="nav-pending-badge hidden" id="nav-badge-equipment">0</span>
+        </button>
+        <button class="nav-item" data-view="qa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11"/></svg>
+          QA Testing Log
+          <span class="nav-pending-badge hidden" id="nav-badge-qa">0</span>
+        </button>
+      </div>
+
+      <div class="nav-category cat-sterilization">
+        <div class="nav-category-label">Sterilization Logs</div>
+        <button class="nav-item" data-view="cycles">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 1 3 6.3"/><path d="M4 20v-5h5"/></svg>
+          Sterilization Cycle Log
+          <span class="nav-pending-badge hidden" id="nav-badge-cycles">0</span>
+        </button>
+        <button class="nav-item" data-view="instruments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 3.5a2.1 2.1 0 0 1 3 3L8 16l-4 1 1-4Z"/></svg>
+          Instrument Maintenance
+        </button>
+      </div>
+
+      <div class="nav-category cat-water">
+        <div class="nav-category-label">Water &amp; Cleaning</div>
+        <button class="nav-item" data-view="ro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c3 4 6 7.5 6 11.5A6 6 0 1 1 6 13.5C6 9.5 9 6 12 2Z"/></svg>
+          RO Water Quality
+        </button>
+        <button class="nav-item" data-view="brush">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l7-7"/><path d="M13 13l6.5-6.5a2.1 2.1 0 0 0-3-3L10 10"/><path d="M4 20l3-1 1-3"/></svg>
+          Cleaning Brush
+        </button>
+      </div>
+
+      <div class="nav-category cat-handover">
+        <div class="nav-category-label">Instrument/Supplies Handover</div>
+        <button class="nav-item" data-view="handover">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3l4 4-4 4"/><path d="M20 7H8a4 4 0 0 0-4 4v1"/><path d="M8 21l-4-4 4-4"/><path d="M4 17h12a4 4 0 0 0 4-4v-1"/></svg>
+          Intake &amp; Release
+          <span class="nav-pending-badge hidden" id="nav-badge-handover">0</span>
+        </button>
+      </div>
+
+      <div class="nav-category cat-facility">
+        <div class="nav-category-label">Facility &amp; Housekeeping</div>
+        <button class="nav-item" data-view="temp-humidity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v9.5a5 5 0 1 0 6 0V5a3 3 0 0 0-3-3Z"/><circle cx="12" cy="17" r="2"/></svg>
+          Temperature &amp; Humidity
+        </button>
+        <button class="nav-item" data-view="housekeeping">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M10 4 4 10c-1 4 2 10 6 10s7-6 6-10l-2-2"/></svg>
+          CSSD Housekeeping
+        </button>
+      </div>
+
+      <div class="nav-group role-admin-plus hidden">
+        <div class="nav-label">Reports</div>
+        <button class="nav-item" data-view="reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5a1 1 0 0 1 1-1h9l6 6v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Z"/><path d="M14 4v6h6"/></svg>
+          KPI Report
+        </button>
+      </div>
+
+      <div class="nav-group role-superuser-only hidden">
+        <div class="nav-divider"></div>
+        <div class="nav-label">Admin</div>
+        <button class="nav-item" data-view="admin">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 20c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg>
+          Manage Staff & Settings
+        </button>
+        <button class="nav-item" data-view="error-reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.7 17.1a1.8 1.8 0 0 0 1.5 2.7h15.6a1.8 1.8 0 0 0 1.5-2.7L13.7 3.9a1.8 1.8 0 0 0-3.4 0Z"/></svg>
+          Error Reports
+          <span class="nav-badge hidden" id="error-reports-badge">0</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="who"><span class="dot"></span><span id="who-name"></span></div>
+        <button class="logout-btn" id="btn-logout">Log out</button>
+        <div class="dev-credit">Developed by <a href="https://ralpparagili.org" target="_blank" rel="noopener">Ralp Paragili</a></div>
+      </div>
+    </nav>
+
+    <main class="main">
+      <div class="top-strip" id="top-strip"></div>
+      <div id="view-ro" class="view-page hidden"></div>
+      <div id="view-ro-history" class="view-page hidden"></div>
+      <div id="view-equipment" class="view-page hidden"></div>
+      <div id="view-equipment-history" class="view-page hidden"></div>
+      <div id="view-cycles" class="view-page hidden"></div>
+      <div id="view-cycles-history" class="view-page hidden"></div>
+      <div id="view-qa" class="view-page hidden"></div>
+      <div id="view-qa-history" class="view-page hidden"></div>
+      <div id="view-instruments" class="view-page hidden"></div>
+      <div id="view-im-history" class="view-page hidden"></div>
+      <div id="view-brush" class="view-page hidden"></div>
+      <div id="view-brush-history" class="view-page hidden"></div>
+      <div id="view-temp-humidity" class="view-page hidden"></div>
+      <div id="view-th-history" class="view-page hidden"></div>
+      <div id="view-housekeeping" class="view-page hidden"></div>
+      <div id="view-hk-history" class="view-page hidden"></div>
+      <div id="view-handover" class="view-page hidden"></div>
+      <div id="view-handover-history" class="view-page hidden"></div>
+      <div id="view-reports" class="view-page hidden"></div>
+      <div id="view-admin" class="view-page hidden"></div>
+      <div id="view-error-reports" class="view-page hidden"></div>
+    </main>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<!-- Third-party libraries -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- App code -->
+<script src="js/config.js"></script>
+<script src="js/offline-queue.js"></script>
+<script src="js/db.js"></script>
+<script src="js/true-time.js"></script>
+<script src="js/search-bar.js"></script>
+<script src="js/dtr-import.js"></script>
+<script src="js/form-draft.js"></script>
+<script src="js/error-reporter.js"></script>
+<script src="js/alarm.js"></script>
+<script src="js/print-report.js"></script>
+<script src="js/history-view.js"></script>
+<script src="js/scheduled-alarms.js"></script>
+<script src="js/missed-entries-view.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/work-calendar.js"></script>
+<script src="js/missed-logs.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/handover-submit-portal.js"></script>
+<script src="js/public-dashboard.js"></script>
+<script src="js/ro.js"></script>
+<script src="js/equipment.js"></script>
+<script src="js/cycle-log.js"></script>
+<script src="js/qa-testing.js"></script>
+<script src="js/instrument-maintenance.js"></script>
+<script src="js/brush.js"></script>
+<script src="js/temp-humidity.js"></script>
+<script src="js/housekeeping.js"></script>
+<script src="js/handover.js"></script>
+<script src="js/reports.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/error-reports-view.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
