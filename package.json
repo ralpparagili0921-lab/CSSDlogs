@@ -1,0 +1,1 @@
+{"private":true,"scripts":{"check":"node tools/check.js","gen-schema":"node tools/gen-schema-expected.js"}}
